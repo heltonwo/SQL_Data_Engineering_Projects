@@ -1,10 +1,36 @@
-/*
+# 🗄️ Local databases
+*.duckdb
+*.duckdb.wal
+*.sqlite
+*.db
 
-!/Projects/
-!/Projects/1_EDA/
-!/Projects/1_EDA/**
+# 📊 Raw data
+/data/raw/
+/data/tmp/
+/data/intermediate/
+/exports/
+data/
 
-!/Resources/
-!/Resources/**
+# 🔐 Secrets
+.env
+.env.*
+*.key
+*.pem
 
-!.gitignore
+# 💻 System files
+.DS_Store
+Thumbs.db
+
+# 📂 Logs and temp files
+logs/
+tmp/
+*.log
+
+# ⚙️ Tooling (dbt, VS Code, venvs, etc.)
+target/
+.idea/
+.vscode/
+__pycache__/
+
+# 🛑 Anotações e estudos pessoais
+ANOTACOES/
