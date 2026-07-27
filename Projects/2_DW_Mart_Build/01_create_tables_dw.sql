@@ -13,7 +13,7 @@ CREATE TABLE company_dim (
 
 CREATE TABLE skills_dim (
     skill_id    INTEGER     PRIMARY KEY,
-    skill       VARCHAR,
+    skills      VARCHAR,
     type        VARCHAR
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE job_postings_fact (
     search_location         VARCHAR,
     job_posted_date         TIMESTAMP,
     job_no_degree_mention   BOOLEAN,
-    job_health_insurnace    BOOLEAN,   
+    job_health_insurance    BOOLEAN,   
     job_country             VARCHAR,     
     salary_rate             VARCHAR, 
     salary_year_avg         DOUBLE,
