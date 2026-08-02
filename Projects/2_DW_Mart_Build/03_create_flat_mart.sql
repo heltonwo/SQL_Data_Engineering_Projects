@@ -1,4 +1,6 @@
--- Step 3 - Create Schema flat_mart 
+-- Step 3: Create Flat Mart
+-- Denormalizes the star schema into a single wide table for analytics.
+-- Skills are nested as an array of structs to maintain one row per job.
 
 DROP SCHEMA IF EXISTS flat_mart CASCADE;
 
@@ -34,8 +36,11 @@ LEFT JOIN skills_job_dim AS sjd
     ON jpf.job_id = sjd.job_id
 LEFT JOIN skills_dim AS sd
     ON sjd.skill_id = sd.skill_id
-GROUP BY ALL;
+GROUP BY ALL; 
 
+-- Note: DuckDB syntax: groups by all non-aggregated columns
+
+-- Data Validation
 SELECT 'Flat Mart Job Postings' AS table_name,
          COUNT(*) AS record_count
    

@@ -1,4 +1,6 @@
--- Step 4 -- Create Skills Demand Mart
+-- Step 4: Create Skills Demand Mart
+-- Builds a dedicated analytical mart focused on monthly skill demand,
+-- with dimensions for skills and time (month), and a fact table with aggregated metrics.
 
 DROP SCHEMA IF EXISTS skills_mart CASCADE;
 
@@ -60,7 +62,7 @@ ORDER BY month_started_date;
 
 -- fact_table
 
-CREATE TABLE skills_mart.fact_skil_demand_monthly(
+CREATE TABLE skills_mart.fact_skill_demand_monthly(
     skill_id                                INTEGER,
     month_started_date                      DATE,
     job_title_short                         VARCHAR,
@@ -74,7 +76,7 @@ CREATE TABLE skills_mart.fact_skil_demand_monthly(
 
 );
 
-INSERT INTO skills_mart.fact_skil_demand_monthly(
+INSERT INTO skills_mart.fact_skill_demand_monthly(
     skill_id,
     month_started_date,
     job_title_short,
@@ -113,12 +115,12 @@ FROM job_postings_prep
 GROUP BY ALL
 ORDER BY skill_id,month_started_date,job_title_short;
 
--- DATA VALIDATION
+-- Data Validation
 SELECT 'Skill Dimension' AS table_name , COUNT(*) AS record_count FROM skills_mart.dim_skills
 UNION ALL
 SELECT 'Date Month Dimension',  COUNT(*) FROM skills_mart.dim_date_month
 UNION ALL
-SELECT 'Skill Demand Fact',  COUNT(*)  FROM skills_mart.fact_skil_demand_monthly;
+SELECT 'Skill Demand Fact',  COUNT(*)  FROM skills_mart.fact_skill_demand_monthly;
 
 SELECT *
 FROM skills_mart.dim_skills  LIMIT 5;
@@ -126,4 +128,4 @@ FROM skills_mart.dim_skills  LIMIT 5;
 SELECT *
 FROM skills_mart.dim_date_month LIMIT 5;
 SELECT *
-FROM skills_mart.fact_skil_demand_monthly LIMIT 5;
+FROM skills_mart.fact_skill_demand_monthly LIMIT 5;

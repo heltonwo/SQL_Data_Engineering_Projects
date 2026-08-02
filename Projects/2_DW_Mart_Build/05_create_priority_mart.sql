@@ -21,7 +21,7 @@ VALUES
     (2, 'Senior Data Engineer', 1),
     (3, 'Software Engineer', 3);
     
--- **Data Validation**  
+-- Data Validation 
 SELECT * FROM  priority_mart.priority_roles;
 
 -- Step 3: Create priority jobs snapshot table
@@ -61,7 +61,7 @@ LEFT JOIN company_dim AS cd
 INNER JOIN priority_mart.priority_roles AS r       
     ON jpf.job_title_short = r.role_name;
 
--- **Data Validation**
+-- Data Validation
 SELECT  job_title_short,
         COUNT(*) AS job_count,
         MIN(priority_lvl)AS priority_lvl,
@@ -70,9 +70,17 @@ FROM priority_mart.priority_jobs_snapshot
 GROUP BY job_title_short
 ORDER BY job_count DESC;
 
-
+-- Data Validation 
 SELECT 'Priority Roles Dimension' AS table_name, COUNT(*) as record_count FROM priority_mart.priority_roles
 UNION ALL
 SELECT 'Priority Jobs Snapshot', COUNT(*) FROM priority_mart.priority_jobs_snapshot;
 
+SELECT 
+    job_title_short,
+    COUNT(*) AS job_count,
+    MIN(priority_lvl) AS priority_lvl,
+    MIN(updated_at) AS updated_at
+FROM priority_mart.priority_jobs_snapshot          
+GROUP BY job_title_short
+ORDER BY job_count DESC;
 

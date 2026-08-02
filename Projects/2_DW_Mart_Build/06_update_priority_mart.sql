@@ -1,6 +1,9 @@
 -- Step 6: Mart - Update priority roles mart (incremental update)
 
 
+-- Step 1: Update existing priority role
+-- Update Data Engineer priority level to 1
+-- Inserting new priority role: Data Scientist with priority level 2
 UPDATE priority_mart.priority_roles
 SET priority_lvl = 1
 WHERE role_name = 'Data Engineer';
@@ -30,14 +33,13 @@ LEFT JOIN company_dim AS cd
 INNER JOIN priority_mart.priority_roles AS r               
     ON jpf.job_title_short = r.role_name;
 
--- ** Data Validation **
-SELECT * FROM src_priority_jobs ;
+
+
  
 -- Step 4: MERGE operation to update snapshot
--- This MERGE statement handles:
--- - Updates when priority_lvl changes (WHEN MATCHED)
--- - Inserts for new jobs (WHEN NOT MATCHED)
--- - Deletes for jobs no longer in source (WHEN NOT MATCHED BY SOURCE)
+-- MERGE statement handles: -- UPADTE (level change) 
+-- INSERT(new jobs) and DELETE (removed jobs) 
+
 MERGE INTO priority_mart.priority_jobs_snapshot AS tgt      
 USING src_priority_jobs AS src
 ON tgt.job_id = src.job_id
@@ -70,7 +72,17 @@ WHEN NOT MATCHED THEN
 WHEN NOT MATCHED BY SOURCE THEN DELETE;
 
 
--- ** Data Validation **
+
+
+-- Data Validation 
+
+SELECT 'Priority Roles Dimension' AS table_name, COUNT(*) as record_count FROM priority_mart.priority_roles
+UNION ALL
+SELECT 'Priority Jobs Snapshot', COUNT(*) FROM priority_mart.priority_jobs_snapshot;
+
+SELECT * FROM src_priority_jobs 
+LIMIT 10;
+
 SELECT 
     job_title_short,
     COUNT(*) AS job_count,
@@ -79,8 +91,3 @@ SELECT
 FROM priority_mart.priority_jobs_snapshot          
 GROUP BY job_title_short
 ORDER BY job_count DESC;
-
--- Verify mart was updated
-SELECT 'Priority Roles Dimension' AS table_name, COUNT(*) as record_count FROM priority_mart.priority_roles
-UNION ALL
-SELECT 'Priority Jobs Snapshot', COUNT(*) FROM priority_mart.priority_jobs_snapshot;
