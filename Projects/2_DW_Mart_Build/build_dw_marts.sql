@@ -1,4 +1,8 @@
--- Step 3 -- RUN 12
+-- Master build script for data warehouse and mart pipeline
+-- This file runs all steps in sequence to build the complete warehouse and marts
+--
+-- Usage (Local):
+--   Run this script with: duckdb dw_marts.duckdb -c ".read build_dw_marts.sql"
 
 -- Step 1: DW Create Star Schema Tables
 .read 01_create_tables_dw.sql
