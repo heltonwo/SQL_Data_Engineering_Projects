@@ -11,7 +11,7 @@ An end-to-end data engineering pipeline that transforms raw CSV files from Googl
 - ✅ **Pipeline scope:** Built a complete **ETL pipeline** from raw CSVs to star schema warehouse to analytical marts
 - ✅ **Data modeling:** Designed a **star schema** with fact tables, dimensions, and bridge tables for many-to-many relationships
 - ✅ **ETL development:** Implemented **extract, transform, load** processes with idempotent operations and data quality checks
-- ✅ **Mart architecture:** Created **specialized data marts** (flat, skills, priority, company) with additive measures and incremental update patterns
+- ✅ **Mart architecture:** Created **specialized data marts** (flat, skills, priority) with additive measures and incremental update patterns
 
 ---
 
@@ -25,7 +25,7 @@ Raw job posting data — over **1.5 million job postings** and **262 distinct sk
 
 **Challenge:** data teams need a single source of truth — a data warehouse — to enable consistent, reliable analysis across the organization. On top of that, specialized data marts are needed to pre-aggregate data for specific business use cases, reducing query complexity and improving performance for common analytical patterns.
 
-**Solution:** an end-to-end ETL pipeline that extracts CSVs from cloud storage, normalizes them into a star schema warehouse (separating facts from dimensions), and builds specialized data marts optimized for specific use cases (flat queries, skill demand analysis, priority role tracking, company hiring trends).
+**Solution:** an end-to-end ETL pipeline that extracts CSVs from cloud storage, normalizes them into a star schema warehouse (separating facts from dimensions), and builds specialized data marts optimized for specific use cases (flat queries, skill demand analysis, priority role tracking).
 
 ---
 
@@ -51,7 +51,6 @@ Raw job posting data — over **1.5 million job postings** and **262 distinct sk
 ├── 04_create_skills_mart.sql      # Skills demand mart
 ├── 05_create_priority_mart.sql    # Priority roles mart
 ├── 06_update_priority_mart.sql    # Priority mart incremental update (MERGE)
-├── 07_create_company_mart.sql     # Company hiring mart (optional)
 ├── build_dw_marts.sql             # Master SQL build script
 └── README.md                      # You are here
 ```
@@ -73,6 +72,7 @@ The data warehouse implements a star schema with `company_dim`, `skills_dim`, `j
   - [`02_load_schema_dw.sql`](./02_load_schema_dw.sql) — extracts CSVs from GCS and loads them into the warehouse tables
 - **Purpose:** star schema serving as the single source of truth for analytical queries
 - **Grain:** one row per job posting in the fact table (`job_postings_fact`)
+- **Key feature:** filters out orphan `job_id`s before loading the bridge table, avoiding FK violations
 
 ### Flat Mart
 
@@ -108,18 +108,6 @@ Priority role tracking with incremental updates using MERGE operations.
 - **Grain:** one row per job posting with a priority level assigned
 - **Key feature:** `MERGE` handles `INSERT`, `UPDATE`, and `DELETE` in a single statement — a production-ready upsert pattern
 
-### Company Mart (optional)
-
-Company hiring trends by role, location, and month.
-
-![Company Mart Schema](../../Resources/images/1_2_Company_Mart.png)
-
-- **SQL file:** [`07_create_company_mart.sql`](./07_create_company_mart.sql) — builds the company hiring trends mart (optional)
-- **Purpose:** analyze company hiring trends by role, location, and month
-- **Grain:** `company_id + job_title_short_id + location_id + month_started_date`
-- **Key feature:** bridge tables for many-to-many relationships (company-location, job title hierarchies)
-- **Note:** this mart is optional and can be skipped if not needed
-
 ---
 
 ## 💻 Data Engineering Skills Demonstrated
@@ -135,7 +123,7 @@ Company hiring trends by role, location, and month.
 ### Dimensional Modeling
 
 - **Star schema design:** fact table (`job_postings_fact`) with dimension tables (`company_dim`, `skills_dim`)
-- **Bridge tables:** many-to-many relationship handling (`skills_job_dim`, plus company-location and job title bridges in the company mart)
+- **Bridge tables:** many-to-many relationship handling (`skills_job_dim`)
 - **Grain definition:** clear, deliberate fact table granularity per mart
 - **Additive measures:** counts and sums that can be safely re-aggregated at any level
 
@@ -154,7 +142,7 @@ Company hiring trends by role, location, and month.
 - **Idempotency:** all scripts are safely rerunnable without side effects
 - **Data validation:** verification queries at each pipeline step to ensure data integrity
 - **Type safety:** explicit data type definitions (`VARCHAR`, `INTEGER`, `DOUBLE`, `BOOLEAN`, `TIMESTAMP`)
-- **Schema organization:** separate schemas (`flat_mart`, `skills_mart`, `priority_mart`, `company_mart`) for logical separation
+- **Schema organization:** separate schemas (`flat_mart`, `skills_mart`, `priority_mart`) for logical separation
 
 ---
 
