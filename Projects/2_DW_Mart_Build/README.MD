@@ -32,6 +32,7 @@ Raw job posting data — over **1.5 million job postings** and **262 distinct sk
 ## 🧰 Tech Stack
 
 - 🐤 **Database:** DuckDB (file-based OLAP database with GCS integration via `httpfs`)
+- ☁️ **Cloud:** MotherDuck — cloud-hosted DuckDB, same pipeline runs unmodified locally or in the cloud
 - 🧮 **Language:** SQL (DDL for schema design, DML for data loading and transformation)
 - 📊 **Data Model:** Star schema (fact + dimension + bridge tables)
 - 🛠️ **Development:** VS Code for SQL editing + Terminal for DuckDB CLI execution
@@ -152,6 +153,9 @@ Priority role tracking with incremental updates using MERGE operations.
 
 Real query output from the built warehouse and marts (DuckDB CLI):
 
+![Running the Build Script](../../Resources/images/howtorun.png)
+*Running the full pipeline with a single command: `duckdb dw_marts.duckdb -c ".read build_dw_marts.sql"`.*
+
 ![Flat Mart Query Result](../../Resources/images/preview_01_flatmart.png)
 *Flat mart returning 1,510,530 job postings, one row per job with skills nested as structs.*
 
@@ -162,7 +166,20 @@ Real query output from the built warehouse and marts (DuckDB CLI):
 *Skills mart validation: 262 skills, 30 months, 51,177 rows in the skill-demand fact table.*
 
 ![Priority Mart Snapshot](../../Resources/images/preview_03_priority_mart_01.png)
-*Priority mart snapshot: 537,098 jobs assigned a priority level, grouped by role.*
+*Priority mart snapshot: 537,098 jobs assigned a priority level, grouped by role (local run).*
+
+### Cloud Deployment (MotherDuck)
+
+The same pipeline was also deployed to [MotherDuck](https://motherduck.com), a cloud-hosted DuckDB service — no changes to the SQL, only the connection target.
+
+![Migrating the local database to MotherDuck](../../Resources/images/preview_md_00_motherduck_cloud_01.png)
+*Copying the local `dw_marts.duckdb` file (600 MB) to a MotherDuck cloud database.*
+
+![Querying job_postings_fact in the MotherDuck UI](../../Resources/images/preview_md_00_motherduck_cloud_02.png)
+*Querying `job_postings_fact` directly in the MotherDuck web UI — 1.6M rows.*
+
+![Running the pipeline against the cloud database](../../Resources/images/preview_md_00_motherduck_cloud_00_creation.png)
+*Running `build_dw_marts.sql` against the cloud database (`duckdb md:dw_marts`) — priority mart snapshot grows to 906,525 rows as the pipeline is re-run against the full dataset.*
 
 ---
 
@@ -170,9 +187,21 @@ Real query output from the built warehouse and marts (DuckDB CLI):
 
 ## 🚀 How to Run
 
+### Local database
+
 ```bash
 duckdb dw_marts.duckdb -c ".read build_dw_marts.sql"
 ```
+
+### Cloud database (MotherDuck)
+
+```bash
+duckdb md:
+CREATE DATABASE dw_marts;
+duckdb md:dw_marts -c ".read build_dw_marts.sql"
+```
+
+The pipeline script (`build_dw_marts.sql`) is environment-agnostic — the same file runs unmodified against either a local DuckDB file or a MotherDuck cloud database. Only the connection target changes.
 
 ---
 
